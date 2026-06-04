@@ -13,6 +13,8 @@
     person['name'] = 'John'
 
     console.log(interestRate)
+
+    
     console.log(person.name)
 
     let selectedColor = ['red','blue'];
