@@ -1,0 +1,9 @@
+# PDF-Formular-Tools (PDF_fill.py, Pdf_filling.py, Trinkter_new.py, checkcheck.py)
+pdfrw>=0.4
+PyPDF2>=3.0.0
+
+# Für das Excel-Modul (find_items) benötigt
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# tkinter ist Teil der Python-Standardbibliothek (kein pip-Paket)
