@@ -1,80 +1,80 @@
-# Trinkter —— 超声设备担保申报 PDF 自动填写工具
+# Trinkter — Automatisches Ausfüllen von KV-Gewährleistungs-PDFs für Ultraschallgeräte
 
-## 简介
+## Überblick
 
-Trinkter 是一个基于 Python + Tkinter 的桌面工具，用于自动填写德国 KV（Kassenärztliche Vereinigung）超声设备担保申报 PDF 表单。它会根据用户输入的设备型号和探头型号，自动勾选对应的 AK（Anwendungsklasse）checkbox，并填写基本信息字段。
+Trinkter ist ein Desktop-Tool auf Basis von Python + Tkinter zum automatischen Ausfüllen der PDF-Formulare für die Gewährleistungserklärung von Ultraschallgeräten bei den deutschen KVen (Kassenärztliche Vereinigungen). Anhand des gewählten Gerätemodells und der Schallköpfe kreuzt das Programm automatisch die passenden AK-Checkboxen (Anwendungsklassen) an und füllt die Stammdatenfelder aus.
 
 ---
 
-## 文件结构
+## Dateistruktur
 
 ```
 Gwe/
-├── Trinkter_new.py      # 主界面（Tkinter GUI）
-├── Pdf_filling.py       # PDF 读写核心逻辑
-├── Excel.py             # 探头 → AK 映射（读取 Excel）
-├── data.xlsx            # 探头 → AK 对照表（Excel.py 读取）
-├── checkcheck.py        # 独立工具：检测 PDF 模板中 AK 表单字段是否齐全
-├── requirements.txt     # Python 依赖列表
-└── README.md            # 本文档
+├── Trinkter_new.py      # Hauptprogramm (Tkinter-GUI)
+├── Pdf_filling.py       # Kernlogik zum Lesen/Schreiben der PDFs
+├── Excel.py             # Schallkopf → AK-Zuordnung (liest Excel)
+├── data.xlsx            # Zuordnungstabelle Schallkopf → AK (wird von Excel.py gelesen)
+├── checkcheck.py        # Eigenständiges Tool: prüft, ob eine PDF-Vorlage alle AK-Formularfelder enthält
+├── requirements.txt     # Python-Abhängigkeiten
+└── README.md            # Dieses Dokument
 ```
 
 ---
 
-## 使用方法
+## Verwendung
 
-### 1. 运行程序
+### 1. Programm starten
 
 ```bash
 python Trinkter_new.py
 ```
 
-### 2. 界面操作步骤
+### 2. Bedienschritte in der Oberfläche
 
-| 步骤 | 字段 | 说明 |
+| Schritt | Feld | Beschreibung |
 |------|------|------|
-| ① | PDF文件 | 点击"浏览"选择要填写的 KV 担保申报 PDF |
-| ② | 公司名称 | 填写 Adresse（公司/机构名称） |
-| ③ | 设备型号 | 从下拉菜单选择设备，设备名称和探头列表会自动更新 |
-| ④ | 设备名称 | 自动填入（选择设备型号后自动填写，可手动修改） |
-| ⑤ | 设备号(SN) | 输入序列号，例如 `360101-M26305870006` |
-| ⑥ | 生产年份 | **自动**从 SN 号解析（只读，无需手动填写） |
-| ⑦ | 日期 | **自动**填入当天日期（格式 DD.MM.YYYY，可修改） |
-| ⑧ | 探头选择 | 在左侧列表选中探头，点击"→"移到右侧；右侧为实际使用的探头 |
-| ⑨ | 输出文件 | 填写输出 PDF 的路径/文件名 |
-| ⑩ | 开始 | 点击"开始"执行填写 |
+| ① | PDF-Datei | Über „浏览" (Durchsuchen) das auszufüllende KV-Gewährleistungs-PDF auswählen |
+| ② | Firmenname | Adresse (Name der Firma/Einrichtung) eintragen |
+| ③ | Gerätemodell | Gerät aus dem Dropdown wählen — Gerätename und Schallkopfliste werden automatisch aktualisiert |
+| ④ | Gerätename | Wird nach Auswahl des Modells automatisch eingetragen (manuell änderbar) |
+| ⑤ | Seriennummer (SN) | Seriennummer eingeben, z. B. `360101-M26305870006` |
+| ⑥ | Baujahr | Wird **automatisch** aus der SN abgeleitet (nur lesend, keine Eingabe nötig) |
+| ⑦ | Datum | Wird **automatisch** mit dem heutigen Datum gefüllt (Format TT.MM.JJJJ, änderbar) |
+| ⑧ | Schallkopfauswahl | Schallköpfe links markieren und mit „→" nach rechts verschieben; rechts stehen die tatsächlich verwendeten |
+| ⑨ | Ausgabedatei | Pfad/Dateiname des Ausgabe-PDFs angeben |
+| ⑩ | Start | Auf „开始" (Start) klicken, um das Ausfüllen zu starten |
 
 ---
 
-## SN 号解析规则
+## Auswertung der Seriennummer
 
-SN 格式示例：`360101-M26305870006`
+Beispiel für das SN-Format: `360101-M26305870006`
 
-程序会提取 `M` 后面的前两位数字作为年份后两位：
+Das Programm nimmt die beiden Ziffern nach dem `M` als letzte zwei Stellen des Baujahrs:
 
-- `M26…` → 生产年份 `2026`
-- `M23…` → 生产年份 `2023`
+- `M26…` → Baujahr `2026`
+- `M23…` → Baujahr `2023`
 
-如果 SN 格式不符合规则（没有 `M` + 两位数字），生产年份字段留空。
+Entspricht die SN nicht diesem Muster (kein `M` + zwei Ziffern), bleibt das Baujahr-Feld leer.
 
 ---
 
-## 如何添加新设备及探头映射
+## Neue Geräte und Schallkopf-Zuordnungen hinzufügen
 
-在 `Trinkter_new.py` 的 `__init__` 方法中找到 `self.device_map` 字典，按如下格式添加新设备：
+In der `__init__`-Methode von `Trinkter_new.py` das Dictionary `self.device_map` suchen und ein neues Gerät nach folgendem Muster ergänzen:
 
 ```python
 self.device_map = {
-    # 已有设备 ...
+    # vorhandene Geräte ...
 
-    "新设备型号名称": {
-        "name": "PDF中显示的完整设备名称",
-        "probes": ["探头1", "探头2", "探头3"]
+    "Neuer Modellname": {
+        "name": "Vollständiger Gerätename, wie er im PDF stehen soll",
+        "probes": ["Schallkopf1", "Schallkopf2", "Schallkopf3"]
     },
 }
 ```
 
-**示例：**
+**Beispiel:**
 
 ```python
 "Acclarix AX8 Series": {
@@ -83,89 +83,89 @@ self.device_map = {
 },
 ```
 
-添加后，新设备会自动出现在下拉菜单中，选择后探头列表自动更新。
+Das neue Gerät erscheint danach automatisch im Dropdown; bei Auswahl wird die Schallkopfliste automatisch aktualisiert.
 
 ---
 
-## 探头频率映射
+## Frequenz-Zuordnung der Schallköpfe
 
-在 `Pdf_filling.py` 中有一个 `frequency_map` 字典，用于将探头型号映射到频率字符串：
+In `Pdf_filling.py` gibt es ein Dictionary `frequency_map`, das Schallkopfmodelle auf Frequenzangaben abbildet:
 
 ```python
 frequency_map = {
     "L743-2": "4-3 MHz",
     "C361-2": "6-3 MHz",
-    # 添加新探头 →
-    "新探头型号": "X-Y MHz",
+    # neuen Schallkopf ergänzen →
+    "Neues Modell": "X-Y MHz",
 }
 ```
 
-如果探头型号符合 `数字-数字` 格式（如 `L17-7HQ`），程序会自动解析频率（`17-7 MHz`），无需手动添加。只有格式特殊的探头才需要在 `frequency_map` 中手动指定。
+Folgt das Schallkopfmodell dem Muster `Zahl-Zahl` (z. B. `L17-7HQ`), leitet das Programm die Frequenz automatisch ab (`17-7 MHz`) — ein manueller Eintrag ist nicht nötig. Nur Schallköpfe mit abweichendem Format müssen manuell in `frequency_map` eingetragen werden.
 
 ---
 
-## PDF 字段说明
+## PDF-Felder
 
-`Pdf_filling.py` 的 `fill_pdf_fields` 函数填写以下字段：
+Die Funktion `fill_pdf_fields` in `Pdf_filling.py` füllt folgende Felder aus:
 
-| PDF字段名 | 内容 | 备注 |
+| PDF-Feldname | Inhalt | Anmerkung |
 |-----------|------|------|
-| `Adresse` / `Adresse_1` | 公司名称 | 两页均填 |
-| `Bezeichnung` / `Bezeichnung_1` | 设备名称 | 两页均填 |
-| `GeräteNummer` / `GeräteNummer_1` | 设备号(SN) | 两页均填 |
-| `Baujahr` / `Baujahr_1` | 生产年份 | 两页均填 |
-| `Auslieferungsdatum` / `Auslieferungsdatum_1` | 交货日期 | 两页均填 |
-| `datum` | 当前日期 | 表单日期签名处 |
-| `Schallkopf 1`~`Schallkopf 5` | 探头型号 | 最多5个 |
-| `Frequenz 1`~`Frequenz 5` | 探头频率 | 与探头对应 |
-| `ak_X_Y` | AK checkbox | 由 Excel 查询结果决定 |
+| `Adresse` / `Adresse_1` | Firmenname | auf beiden Seiten |
+| `Bezeichnung` / `Bezeichnung_1` | Gerätename | auf beiden Seiten |
+| `GeräteNummer` / `GeräteNummer_1` | Seriennummer (SN) | auf beiden Seiten |
+| `Baujahr` / `Baujahr_1` | Baujahr | auf beiden Seiten |
+| `Auslieferungsdatum` / `Auslieferungsdatum_1` | Lieferdatum | auf beiden Seiten |
+| `datum` | aktuelles Datum | bei der Unterschriftszeile |
+| `Schallkopf 1`–`Schallkopf 5` | Schallkopfmodelle | maximal 5 |
+| `Frequenz 1`–`Frequenz 5` | Schallkopf-Frequenzen | passend zu den Schallköpfen |
+| `ak_X_Y` | AK-Checkboxen | ergebnisabhängig aus der Excel-Abfrage |
 
-若需新增填写字段，在 `fill_pdf_fields` 函数中仿照以下格式添加：
+Weitere Felder lassen sich in `fill_pdf_fields` nach diesem Muster ergänzen:
 
 ```python
-set_text_field(pdf, "新字段名", 变量值)
+set_text_field(pdf, "Neuer Feldname", wert)
 ```
 
 ---
 
-## AK checkbox 勾选逻辑
+## Logik der AK-Checkboxen
 
-1. 用户在界面选择探头后，`Excel.find_items()` 根据探头列表查询 Excel 表，返回应勾选的 AK 编号列表（如 `["AK 2.1", "AK 3.4", ...]`）
-2. 程序将 AK 编号标准化为 `ak_X_Y` 格式（`normalize_name` 函数）
-3. 遍历 PDF 所有 checkbox 字段，名称匹配则勾选
+1. Nach der Schallkopfauswahl liefert `Excel.find_items()` anhand der Schallkopfliste die anzukreuzenden AK-Nummern aus der Excel-Tabelle (z. B. `["AK 2.1", "AK 3.4", ...]`)
+2. Die AK-Nummern werden in das Format `ak_X_Y` normalisiert (Funktion `normalize_name`)
+3. Alle Checkbox-Felder des PDFs werden durchlaufen; bei Namensübereinstimmung wird angekreuzt
 
-**特殊规则：**
-- 设备名称为 `DUS 60` 时，自动追加 `AK 20.12`（Farbkodierte nein）
-- 其他设备自动追加 `AK 20.11`（Farbkodierte ja）
+**Sonderregeln:**
+- Beim Gerätenamen `DUS 60` wird automatisch `AK 20.12` ergänzt (Farbkodierte: nein)
+- Bei allen anderen Geräten wird automatisch `AK 20.11` ergänzt (Farbkodierte: ja)
 
 ---
 
-## checkcheck.py —— PDF 模板字段检测工具（独立使用）
+## checkcheck.py — Prüftool für PDF-Vorlagen (eigenständig)
 
-`checkcheck.py` **不属于主程序**（`Trinkter_new.py` 不会调用它），是一个独立的命令行小工具，用于在使用新的 KV PDF 模板之前，检测该 PDF 中是否包含所有需要的 AK checkbox 表单字段（`ak_1_1`、`ak_2_3` 这类字段名）。
+`checkcheck.py` gehört **nicht zum Hauptprogramm** (`Trinkter_new.py` ruft es nicht auf). Es ist ein eigenständiges Kommandozeilen-Tool, mit dem man vor der Verwendung einer neuen KV-PDF-Vorlage prüft, ob das PDF alle benötigten AK-Checkbox-Formularfelder enthält (Feldnamen wie `ak_1_1`, `ak_2_3`).
 
-**工作原理：**
+**Funktionsweise:**
 
-1. 用 PyPDF2 读取 PDF 中所有表单字段名
-2. 生成完整的 AK 编号清单（AK 1.1 ~ AK 23.1，共约 50 项）
-3. 将每个 AK 编号标准化为 `ak_X_Y` 格式，逐一检查 PDF 中是否存在同名字段
-4. 输出每项的 ✓/✗ 结果和总完成度百分比
+1. Liest mit PyPDF2 alle Formularfeldnamen aus dem PDF
+2. Erzeugt die vollständige AK-Liste (AK 1.1 bis AK 23.1, rund 50 Einträge)
+3. Normalisiert jede AK-Nummer in das Format `ak_X_Y` und prüft, ob ein gleichnamiges Feld im PDF existiert
+4. Gibt pro Eintrag ✓/✗ sowie den Vollständigkeitsgrad in Prozent aus
 
-**使用方法：**
+**Verwendung:**
 
-打开 `checkcheck.py`，把开头的 `PDF_PATH` 改成要检测的 PDF 文件名：
+In `checkcheck.py` am Dateianfang `PDF_PATH` auf die zu prüfende PDF-Datei setzen:
 
 ```python
 PDF_PATH = "KV Hessen.pdf"
 ```
 
-然后运行：
+Dann ausführen:
 
 ```bash
 python checkcheck.py
 ```
 
-输出示例：
+Beispielausgabe:
 
 ```
 AK 1.1   ✓
@@ -175,38 +175,38 @@ AK 20.11 ✗
 完成度: 48/50 (96.0%)
 ```
 
-带 ✗ 的项说明 PDF 模板中缺少对应的 checkbox 字段，主程序填写该模板时这些 AK 将无法被勾选，需要先在 PDF 编辑器中补齐字段（字段名格式为 `ak_X_Y`）。
+Einträge mit ✗ bedeuten: Der PDF-Vorlage fehlt das entsprechende Checkbox-Feld. Das Hauptprogramm kann diese AK dann nicht ankreuzen — das Feld muss zuerst in einem PDF-Editor ergänzt werden (Feldname im Format `ak_X_Y`).
 
 ---
 
-## 依赖安装
+## Installation der Abhängigkeiten
 
 ```bash
 pip install -r requirements.txt
 ```
 
-包含：`pdfrw`（主程序 PDF 读写）、`PyPDF2`（checkcheck.py）、`pandas` + `openpyxl`（Excel.py 读取 data.xlsx）。
+Enthält: `pdfrw` (PDF-Verarbeitung im Hauptprogramm), `PyPDF2` (checkcheck.py), `pandas` + `openpyxl` (Excel.py liest data.xlsx).
 
-（其余为标准库：`tkinter`、`re`、`threading`、`datetime`）
+(Der Rest ist Standardbibliothek: `tkinter`, `re`, `threading`, `datetime`)
 
 ---
 
-## 常见问题
+## Häufige Fragen
 
-**Q: 为什么某些 checkbox 没有被勾选？**
+**F: Warum werden manche Checkboxen nicht angekreuzt?**
 
-A: 检查 PDF 中该字段的实际名称是否与 `ak_X_Y` 格式一致。可在 `Pdf_filling.py` 中查看控制台打印的"目标字段"和匹配结果。
+A: Prüfen, ob der tatsächliche Feldname im PDF dem Format `ak_X_Y` entspricht. In der Konsolenausgabe von `Pdf_filling.py` sind die Zielfelder und die Treffer zu sehen. Zur systematischen Prüfung einer Vorlage eignet sich `checkcheck.py`.
 
-**Q: 如何更换 PDF 模板？**
+**F: Wie wechsle ich die PDF-Vorlage?**
 
-A: 直接在界面选择新的 PDF 文件即可。不同 KV 的 PDF 字段名需与 `fill_pdf_fields` 中的字段名一致。如有差异，需在 `Pdf_filling.py` 中相应修改字段名。
+A: Einfach in der Oberfläche eine andere PDF-Datei auswählen. Die Feldnamen der jeweiligen KV-Vorlage müssen zu den Feldnamen in `fill_pdf_fields` passen; bei Abweichungen die Feldnamen in `Pdf_filling.py` entsprechend anpassen.
 
-**Q: 日期格式可以改吗？**
+**F: Lässt sich das Datumsformat ändern?**
 
-A: 可以。在 `Trinkter_new.py` 中找到：
+A: Ja. In `Trinkter_new.py` folgende Zeile suchen:
 
 ```python
 self.datum_var = tk.StringVar(value=date.today().strftime("%d.%m.%Y"))
 ```
 
-将 `"%d.%m.%Y"` 改为所需格式，如 `"%Y-%m-%d"` 即为 `2026-06-29` 格式。
+und `"%d.%m.%Y"` durch das gewünschte Format ersetzen, z. B. ergibt `"%Y-%m-%d"` das Format `2026-06-29`.
