@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import threading
 import re
-from datetime import date
 from tkinter import filedialog
 
 from Pdf_filling import fill_pdf_fields
@@ -18,21 +17,21 @@ class PDFFillerApp:
         # ================= 设备 → 探头映射 =================
         self.device_map = {
             "Acclarix AX3 Series": {
-                "name": "Acclarix AX3 Diagnostic Ultrasound System",
+                "name": "AX3",
                 "probes": ["C5-2Q", "P5-1Q", "E8-4Q", "L17-7HQ", "L17-7SQ", "MC8-4Q","P7-3Q", "MC9-3TQ",
                            "C6-2MQ", "C5-1Q", "E10-3HQ", "E10-3BQ", "L12-5HQ", "L12-5Q", "L12-5WQ",
                            "ECL12-3Q", "E10-3Q", "C5-2XQ"
                            ]
             },
             "Acclarix LX3 Series": {
-                "name": "Acclarix LX3 Diagnostic Ultrasound System",
+                "name": "LX3",
                 "probes": ["L17-7HQ", "E8-4Q", "C5-2Q", "L12-5Q", "MC8-4Q", "L17-7SQ",
                            "P5-1Q", "P7-3Q", "MC9-3TQ", "E10-3HQ", "C6-2MQ", "C5-1Q", "L12-5HQ",
                            "E10-3BQ", "L12-5WQ", "C5-2XQ", "E10-3Q"
                            ]
             },
             "Acclarix LX25": {
-                "name": "Acclarix LX25 Diagnostic Ultrasound System",
+                "name": "LX25",
                 "probes": [
                     "C5-2Q", "P5-1Q", "E8-4Q", "L17-7HQ", "L17-7SQ",
                     "MC8-4Q", "P7-3Q", "MC9-3TQ", "C6-2MQ",
@@ -100,9 +99,9 @@ class PDFFillerApp:
 
         self.baujahr_var = tk.StringVar()
 
-        ttk.Label(main, text="日期(自动)").grid(row=6, column=0)
-        self.datum_var = tk.StringVar(value=date.today().strftime("%d.%m.%Y"))
-        ttk.Entry(main, textvariable=self.datum_var).grid(row=6, column=1)
+        ttk.Label(main, text="交货日期").grid(row=5, column=0)
+        self.datum_var = tk.StringVar()
+        ttk.Entry(main, textvariable=self.datum_var).grid(row=5, column=1)
 
         # ================= 探头 =================
         self.left_listbox = tk.Listbox(main, selectmode=tk.MULTIPLE, height=10)
@@ -150,8 +149,7 @@ class PDFFillerApp:
         sn = self.geraet_var.get()
         m = re.search(r'M(\d{2})', sn)
         if m:
-            year = "20" + m.group(1)
-            self.baujahr_var.set(year)
+            self.baujahr_var.set("20" + m.group(1))
         else:
             self.baujahr_var.set("")
 
