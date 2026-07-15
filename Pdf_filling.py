@@ -1,5 +1,4 @@
 import re
-from datetime import date
 from pdfrw import PdfReader, PdfWriter, PdfName, PdfDict
 
 # ================= 文本字段填写 =================
@@ -90,7 +89,7 @@ def check_items_by_name(pdf, items_to_check):
     checked_count = 0
 
     normalized_items = [normalize_name(i) for i in items_to_check]
-    # print("目标字段:", normalized_items)
+    print("目标字段:", normalized_items)
 
     for page_num, page in enumerate(pdf.pages, 1):
         if PdfName.Annots in page:
@@ -132,7 +131,7 @@ def check_items_by_name(pdf, items_to_check):
                     checked_count += 1
                     print(f"✅ 已勾选: {raw_name}")
 
-    # print(f"\n完成勾选 {checked_count} 个checkbox")
+    print(f"\n完成勾选 {checked_count} 个checkbox")
     return checked_count
 
 # ================= 主函数 =================
@@ -159,9 +158,9 @@ def fill_pdf_fields(
     set_text_field(pdf, "Baujahr", baujahr)
     set_text_field(pdf, "Auslieferungsdatum", datum)
 
-    today = date.today().strftime("%d.%m.%Y")
-    ort_datum_value = f"Langen, {today}"
-    set_text_field(pdf, "datum", today)
+    set_text_field(pdf, "datum", datum)
+
+    ort_datum_value = f"Langen, {datum}"
     set_text_field(pdf, "Ort Datum", ort_datum_value)
     set_text_field(pdf, "Ort Datum_1", ort_datum_value)
 

@@ -1,4 +1,5 @@
 from PyPDF2 import PdfReader
+import re
 
 PDF_PATH = "KV Hessen.pdf"
 
