@@ -13,6 +13,9 @@ Gwe/
 ├── Trinkter_new.py      # 主界面（Tkinter GUI）
 ├── Pdf_filling.py       # PDF 读写核心逻辑
 ├── Excel.py             # 探头 → AK 映射（读取 Excel）
+├── data.xlsx            # 探头 → AK 对照表（Excel.py 读取）
+├── checkcheck.py        # 独立工具：检测 PDF 模板中 AK 表单字段是否齐全
+├── requirements.txt     # Python 依赖列表
 └── README.md            # 本文档
 ```
 
@@ -137,11 +140,52 @@ set_text_field(pdf, "新字段名", 变量值)
 
 ---
 
+## checkcheck.py —— PDF 模板字段检测工具（独立使用）
+
+`checkcheck.py` **不属于主程序**（`Trinkter_new.py` 不会调用它），是一个独立的命令行小工具，用于在使用新的 KV PDF 模板之前，检测该 PDF 中是否包含所有需要的 AK checkbox 表单字段（`ak_1_1`、`ak_2_3` 这类字段名）。
+
+**工作原理：**
+
+1. 用 PyPDF2 读取 PDF 中所有表单字段名
+2. 生成完整的 AK 编号清单（AK 1.1 ~ AK 23.1，共约 50 项）
+3. 将每个 AK 编号标准化为 `ak_X_Y` 格式，逐一检查 PDF 中是否存在同名字段
+4. 输出每项的 ✓/✗ 结果和总完成度百分比
+
+**使用方法：**
+
+打开 `checkcheck.py`，把开头的 `PDF_PATH` 改成要检测的 PDF 文件名：
+
+```python
+PDF_PATH = "KV Hessen.pdf"
+```
+
+然后运行：
+
+```bash
+python checkcheck.py
+```
+
+输出示例：
+
+```
+AK 1.1   ✓
+AK 2.1   ✓
+AK 20.11 ✗
+...
+完成度: 48/50 (96.0%)
+```
+
+带 ✗ 的项说明 PDF 模板中缺少对应的 checkbox 字段，主程序填写该模板时这些 AK 将无法被勾选，需要先在 PDF 编辑器中补齐字段（字段名格式为 `ak_X_Y`）。
+
+---
+
 ## 依赖安装
 
 ```bash
-pip install pdfrw
+pip install -r requirements.txt
 ```
+
+包含：`pdfrw`（主程序 PDF 读写）、`PyPDF2`（checkcheck.py）、`pandas` + `openpyxl`（Excel.py 读取 data.xlsx）。
 
 （其余为标准库：`tkinter`、`re`、`threading`、`datetime`）
 
